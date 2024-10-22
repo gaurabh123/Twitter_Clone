@@ -1,0 +1,73 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+// schema for all our models. 
+
+// Writing all the Models, hot reload can get messy later. 
+// We will push them and not modify any longer. 
+model User {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  name String?
+  username String? @unique
+  bio String?
+  email String? @unique
+  emailVerified DateTime?
+  image String?
+  coverImage String?
+  profileImage String? //duplicate profile image, 
+  hashedPassword String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  followingIds String[] @db.ObjectId
+  hasNotification Boolean?
+
+  posts Post[]
+  comments Comment[]
+  notifications Notification[]
+}
+
+// user relation with  Comment. 
+// each post relation with Comment 
+
+model Post{
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  body String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  userId String @db.ObjectId
+  likedIds String[] @db.ObjectId
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade) // using field userId, reference to useId, in user. When user delete cascade the post. 
+  comments Comment[]
+}
+
+model Comment{
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  body String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  userId String @db.ObjectId
+  postId String @db.ObjectId
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+}
+
+model Notification{
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  body String
+  userId String @db.ObjectId
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+}

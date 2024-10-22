@@ -1,0 +1,6 @@
+{
+    "typescript.format.enable": false,
+    "[typescriptreact]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode"
+    }
+  }
